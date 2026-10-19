@@ -1,0 +1,13 @@
+{
+  "user": "YOUR_SIP_USER",
+  "password": "SET_ME_OR_USE_SIP_PASSWORD_ENV_VAR",
+  "domain": "sip.kompaas.tech",
+  "display_name": "",
+  "input_device": null,
+  "output_device": null,
+  "ring_device": null,
+  "device_rate": 48000,
+  "record_split": false,
+  "switch_mode": "hold",
+  "max_calls": 10
+}

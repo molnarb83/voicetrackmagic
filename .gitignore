@@ -1,0 +1,6 @@
+siptest.json
+*.wav
+__pycache__/
+build/
+dist/
+*.spec
