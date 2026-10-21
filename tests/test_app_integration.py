@@ -49,6 +49,10 @@ def env(tmp_path, monkeypatch):
     monkeypatch.setenv('APPDATA', str(home / 'appdata'))
     monkeypatch.setenv('LOCALAPPDATA', str(home / 'local'))
     monkeypatch.setenv('USERPROFILE', str(home))
+    # no modal dialogs in tests (e.g. 'FFmpeg not found' on a CI machine without ffmpeg)
+    from PyQt5.QtWidgets import QMessageBox
+    for name in ('warning', 'information', 'critical', 'question'):
+        monkeypatch.setattr(QMessageBox, name, staticmethod(lambda *a, **k: QMessageBox.Ok))
     prov = MockProvider()
     yield {'prov': prov, 'tmp': tmp_path}
     prov.close()
