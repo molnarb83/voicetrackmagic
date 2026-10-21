@@ -21,7 +21,16 @@ jobs:
       - name: Run tests (mock SIP provider, fake sound card, offscreen Qt)
         env:
           QT_QPA_PLATFORM: offscreen
-        run: python -m pytest -q tests
+        shell: pwsh
+        run: |
+          python -m pytest -q -x -rA tests 2>&1 | Tee-Object -FilePath pytest-out.txt
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-output
+          path: pytest-out.txt
 
       - name: Build VoiceTrackMagic.exe
         run: python -m PyInstaller VoiceTrackMagic.spec --clean --noconfirm
