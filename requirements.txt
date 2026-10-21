@@ -1,2 +1,8 @@
-numpy>=1.23
+PyQt5>=5.15
+pydub>=0.25
 sounddevice>=0.4.6
+numpy>=1.24
+pymysql>=1.1
+# build-only:
+pyinstaller>=6.0
+Pillow>=10.0

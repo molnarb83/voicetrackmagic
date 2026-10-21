@@ -87,7 +87,9 @@ class Call:
         if st == CONNECTED:
             st = 'held (by us)' if self.local_held else ('held (by remote)' if self.remote_held else 'connected')
         return {'line': self.line, 'state': st, 'who': self.label, 'dir': self.direction,
-                'secs': int(time.time() - (self.connected_at or self.created))}
+                'secs': int(time.time() - (self.connected_at or self.created)),
+                'number': self.number, 'name': self.name, 'ringing': self.state == RINGING_IN,
+                'call_id': self.call_id}
 
 
 class UserAgent:

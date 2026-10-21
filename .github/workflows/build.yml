@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+
+      - name: Run tests (mock SIP provider, fake sound card, offscreen Qt)
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q tests
+
+      - name: Build VoiceTrackMagic.exe
+        run: python -m PyInstaller VoiceTrackMagic.spec --clean --noconfirm
+
+      - name: Build SipTest.exe
+        run: >
+          python -m PyInstaller --onefile --name SipTest
+          --collect-all sounddevice --collect-binaries _sounddevice_data
+          siptest.py
+
+      - name: Smoke test SipTest.exe
+        shell: pwsh
+        run: |
+          .\dist\SipTest.exe --list-devices
+          if ($LASTEXITCODE -ne 0) { throw "SipTest.exe --list-devices failed ($LASTEXITCODE)" }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VoiceTrackMagic-windows
+          path: |
+            dist/VoiceTrackMagic.exe
+            dist/SipTest.exe
+            siptest.example.json

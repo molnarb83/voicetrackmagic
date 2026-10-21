@@ -1,6 +1,9 @@
 siptest.json
 *.wav
 __pycache__/
+.pytest_cache/
 build/
 dist/
-*.spec
+*.ico
+ffmpeg.exe
+%APPDATA%/

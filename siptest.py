@@ -26,6 +26,7 @@ import time
 from datetime import datetime
 
 from sipphone.media import Mixer, NullAudio
+from sipphone.ring import RingTone
 from sipphone.ua import SipConfig, UserAgent
 
 
@@ -40,43 +41,6 @@ def say(msg):
 def list_devices():
     import sounddevice as sd
     print(sd.query_devices())
-
-
-class RingTone:
-    """Plays a ring pattern on its own output device while lines are ringing."""
-
-    def __init__(self, device):
-        self.device, self.stream, self.pos = device, None, 0
-        self.rate = 48000
-
-    def start(self):
-        if self.stream or self.device is None:
-            return
-        import numpy as np
-        import sounddevice as sd
-        t = np.arange(self.rate * 6) / self.rate
-        tone = 0.25 * (np.sin(2 * np.pi * 425 * t) + np.sin(2 * np.pi * 475 * t))
-        env = ((t % 4.0) < 1.0).astype('float32')           # 1 s on, 3 s off
-        self.buf = (tone * env * 12000).astype('int16')
-        self.buf = self.buf[:self.rate * 4]
-
-        def cb(out, frames, ti, status):
-            n = len(self.buf)
-            idx = (self.pos + np.arange(frames)) % n
-            out[:, 0] = self.buf[idx]
-            self.pos = (self.pos + frames) % n
-        self.stream = sd.OutputStream(device=self.device, samplerate=self.rate, channels=1,
-                                      dtype='int16', callback=cb)
-        self.stream.start()
-
-    def stop(self):
-        if self.stream:
-            try:
-                self.stream.stop()
-                self.stream.close()
-            except Exception:
-                pass
-            self.stream = None
 
 
 def main(argv=None):
